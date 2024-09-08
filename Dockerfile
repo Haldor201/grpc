@@ -17,8 +17,8 @@ WORKDIR /app
 # Instala las dependencias de Python
 RUN pip install -r requirements.txt
 
-# Expone el puerto en el que tu servidor gRPC escucha
+# Expone el puerto en el que tu servidor escucha
 EXPOSE 50051
 
-# Comando para ejecutar Envoy y tu servidor
+# Comando para ejecutar Envoy y tu aplicación
 CMD ["sh", "-c", "envoy -c /etc/envoy/envoy.yaml & python server.py"]

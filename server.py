@@ -26,9 +26,9 @@ class GreeterServicer(gRPC_pb2_grpc.GreeterServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     gRPC_pb2_grpc.add_GreeterServicer_to_server(GreeterServicer(), server)
-    server.add_insecure_port('[::]:20102')
+    server.add_insecure_port('[::]:50051')
     server.start()
-    print("Server started on port 20102")
+    print("Server started on port 50051")
     server.wait_for_termination()
 
 if __name__ == '__main__':
