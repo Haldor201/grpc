@@ -4,8 +4,8 @@ import gRPC_pb2
 import gRPC_pb2_grpc
 from bd import findByCode
 import json
+import os  # Importa os para leer variables de entorno
 
-# Implementa el servicio definido en el archivo .proto
 class GreeterServicer(gRPC_pb2_grpc.GreeterServicer):
     def SayHello(self, request, context):
         try:
@@ -26,9 +26,13 @@ class GreeterServicer(gRPC_pb2_grpc.GreeterServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     gRPC_pb2_grpc.add_GreeterServicer_to_server(GreeterServicer(), server)
-    server.add_insecure_port('[::]:50051')
+    
+    # Obtén el puerto de la variable de entorno o usa 50051 como predeterminado
+    port = os.environ.get('PORT', '50051')
+    server.add_insecure_port(f'[::]:{port}')
+    
     server.start()
-    print("Server started on port 50051")
+    print(f"Server started on port {port}")
     server.wait_for_termination()
 
 if __name__ == '__main__':
