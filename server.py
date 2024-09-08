@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from pymongo import MongoClient
 from typing import Dict, Optional
@@ -20,8 +20,12 @@ def findByCode(code: str):
     client.close()
     return resultado
 
+def log_message(message: Dict):
+    # Aquí podrías registrar el mensaje, enviarlo a otro servicio, etc.
+    print(f"Mensaje registrado en segundo plano: {message}")
+
 @app.post("/sayhello/", response_model=HelloReply)
-async def say_hello(request: HelloRequest):
+async def say_hello(request: HelloRequest, background_tasks: BackgroundTasks):
     try:
         print("Solicitud Recibida")
         resultado = findByCode(request.name)
@@ -31,6 +35,10 @@ async def say_hello(request: HelloRequest):
             message = resultado  # Devuelve el diccionario directamente
         else:
             message = {"error": "No se encontró el código"}  # Devuelve un diccionario con un mensaje de error
+        
+        # Agrega una tarea en segundo plano para registrar el mensaje
+        background_tasks.add_task(log_message, message)
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
