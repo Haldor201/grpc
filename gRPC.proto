@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+service Greeter {
+  // Definimos una función llamada SayHello que recibe un mensaje de solicitud
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// Este mensaje representa la solicitud del cliente
+message HelloRequest {
+  string name = 1;
+}
+
+// Este mensaje representa la respuesta del servidor
+message HelloReply {
+  string message = 1;
+}
