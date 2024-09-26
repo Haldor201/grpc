@@ -1,9 +1,19 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pymongo import MongoClient
 from typing import Dict, Optional
 
 app = FastAPI()
+
+# Configuración de CORS para permitir todos los orígenes
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permitir todos los orígenes
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos
+    allow_headers=["*"],   # Permitir todos los encabezados
+)
 
 class HelloRequest(BaseModel):
     name: str
@@ -21,7 +31,6 @@ def findByCode(code: str):
     return resultado
 
 def log_message(message: Dict):
-    # Aquí podrías registrar el mensaje, enviarlo a otro servicio, etc.
     print(f"Mensaje registrado en segundo plano: {message}")
 
 @app.post("/sayhello/", response_model=HelloReply)
@@ -32,11 +41,10 @@ async def say_hello(request: HelloRequest, background_tasks: BackgroundTasks):
         
         if resultado:
             resultado['_id'] = str(resultado['_id'])  # Convertimos ObjectId a string
-            message = resultado  # Devuelve el diccionario directamente
+            message = resultado
         else:
-            message = {"error": "No se encontró el código"}  # Devuelve un diccionario con un mensaje de error
+            message = {"error": "No se encontró el código"}
         
-        # Agrega una tarea en segundo plano para registrar el mensaje
         background_tasks.add_task(log_message, message)
         
     except Exception as e:
